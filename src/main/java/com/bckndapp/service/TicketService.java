@@ -1,9 +1,6 @@
 package com.bckndapp.service;
 
-import com.bckndapp.entity.Projection;
-import com.bckndapp.entity.Seat;
-import com.bckndapp.entity.Ticket;
-import com.bckndapp.entity.User;
+import com.bckndapp.entity.*;
 import com.bckndapp.repository.ProjectionRepository;
 import com.bckndapp.repository.SeatRepository;
 import com.bckndapp.repository.TicketRepository;
@@ -14,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.naming.directory.SearchResult;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -41,6 +39,9 @@ public class TicketService {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad data in json projection or user doesnt exist");
 		}
+		if(!checkIfSeatBelongsToHall(projection,seat)){
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("seat doesnt belong to any hall in projection");
+		}
 		ticket.setProjection(projection);
 		ticket.setUser(user);
 		if(!checkForReservation((List<Seat>) seat.getHall().getSeats(),ticket,projection)){
@@ -50,6 +51,16 @@ public class TicketService {
 		user.getTickets().add(ticket);
 		userRepository.save(user);
 		return ResponseEntity.ok("ticket is successfully added");
+	}
+
+	private boolean checkIfSeatBelongsToHall(Projection projection, Seat seat) {
+		List<Hall> halls = (List<Hall>) projection.getHalls();
+		List<Seat>ret = new ArrayList<>();
+		for (Hall hall : halls){
+			List<Seat> seats= hall.getSeats().stream().filter(s -> s.getSeat_id().equals(seat.getSeat_id())).toList();
+			ret.addAll(seats);
+		}
+		return ret.size() > 0;
 	}
 
 	private boolean checkForReservation(List<Seat> seats,Ticket ticket,Projection projection) {

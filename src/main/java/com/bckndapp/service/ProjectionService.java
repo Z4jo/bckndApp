@@ -111,7 +111,8 @@ public class ProjectionService {
 	}
 
 	private List<Projection> getAllConflictProjections(List<Hall> halls, Timestamp startOfMovie,Timestamp endOfMovie) {
-		List<Projection>conflictProjections	= projectionRepository.findAllByStartOfProjectionBetween(startOfMovie,endOfMovie);
+		List<Projection>conflictProjections	= projectionRepository.findAllByEndOfProjectionBetween(startOfMovie,endOfMovie);
+		conflictProjections.addAll(projectionRepository.findAllByStartOfProjectionBetween(startOfMovie,endOfMovie));
 		for(Hall hall: halls){
 
 			Optional<Projection>optionalProjection =projectionRepository.findFirstByStartOfProjectionBeforeAndHalls_HallId(startOfMovie,hall.getHallId());

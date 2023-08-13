@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProjectionRepository extends CrudRepository<Projection,Long> {
-	List<Projection> findAllByStartOfProjectionBetween(Timestamp firstDate, Timestamp secondDate);
-
+	List<Projection> findAllByEndOfProjectionBetween(Timestamp start, Timestamp end);
+	List<Projection> findAllByStartOfProjectionBetween(Timestamp start, Timestamp end);
 	Optional<Projection> findFirstByStartOfProjectionBeforeAndHalls_HallId(Timestamp startOfProjection, Long hallId);
 
 }
